@@ -1,0 +1,59 @@
+---
+title: "Adverse Mental Health Outcomes among Adults with A History of Cancer in the United States"
+author: "Meng Chen, Shurui Wang"
+date: "2023-03-07"
+output:
+  prettydoc::html_pretty:
+    theme: cayman
+    highlight: github
+---
+
+# Introduction
+
+It is estimated that 1.9 million new cancer cases will be diagnosed in 2022 in the United States.<sup>1</sup> The number of cancer survivors continues to increase as a result of the improvement of cancer detection and treatment as well as the aging population.<sup>2</sup> Over 18 million individuals with a cancer diagnosis in the US were estimated to be alive by 2020<sup>3</sup> and this number was expected to be larger than 20 million in 2026.<sup>4</sup> Studies have shown that individuals with a history of cancer are at a greater risk of developing mental health disorders compared to the general population.<sup>5,6</sup> Furthermore, cancer patients with psychiatric disorders have higher mortality rates<sup>7</sup>, indicating the importance of addressing mental health in this population.
+
+Mental health problems of people with a history of cancer are well-documented. However, previous studies mainly focused on specific groups of cancer patients<sup>8-11</sup> or specific types of cancer.<sup>12-14</sup> In order to fully understand the prevalence and factors associated with mental health outcomes in the cancer patient population in the US, it is necessary to conduct a comprehensive analysis that includes individuals with a history of all types of cancer. In response, the present study analyzed data from the National Survey on Drug Use and Health (NSDUH) to investigate trends in depression, suicidality, and psychological distress among individuals with a history of cancer in the US, with the aim of evaluating adverse mental health outcomes among various subgroups and identifying potential risk factors in a nationally representative US sample of adults with a history of cancer.
+
+The NSDUH is a nationally representative survey conducted annually in the United States by the Substance Abuse and Mental Health Services Administration (SAMHSA).<sup>15</sup> It collects data on substance use, mental health, and other health-related topics from individuals aged 12 years and older.<sup>15</sup> Cases, defined as individuals who reported a history of cancer and were aged 18 years or older at the time of the survey, were collected from a survey question that inquired respondents whether they had ever received a cancer or malignancy diagnosis from a healthcare professional. This study includes a range of variables, including any mental illness during the past year, as well as demographic and clinical variables such as age, gender, race/ethnicity, income, insurance, and overall health. These variables were collected from survey questions as well and detailed definitions can be found in the public use files codebook on SAMSHA’s website.<sup>16</sup>
+
+# Variables
+
+In this study, our outcome of interest is the status of AMHO. Any mental illness is defined as having serious, moderate, or mild mental illness and is determined with a multivariable prediction model developed by the SAMHSA which determines the predicted probability of having any mental illness with a continuous score. Adults with any mental illness in the past year were defined as those whose score was beyond the specific cutoff point.<sup>17</sup>
+
+Predictors of interest for AMHO include demographic, socioeconomic, and clinical characteristics.<sup>18</sup> Demographic predictors include age, gender, and race/ethnicity. Socioeconomic predictors include family income, marital status, and health insurance status. The clinical predictor includes self-rated health status. 
+
+# Data analysis plan
+
+First, we will examine and compare the prevalence of AMHO between individuals with and without a history of cancer using a bar plot to visualize the results and get an overview of the association between AMHO and cancer. The prevalence of AMHO among individuals with a history of cancer is hypothesized to be higher than that among individuals without a history of cancer.
+
+Subsequently, in the adult cancer patient population, the prevalence of AMHO among different groups of individuals divided by different demographic, socioeconomic, and clinical factors to explore potential risk factors. Since there are too many factors, a loop will be written to conduct the visualization.
+
+Finally, a multivariable logistic regression analysis will be conducted to predict risk factors of AMHO in the adult cancer patient population. Studies have proven that age might affect cancer patients’ overall health status due to several reasons including influence of age on choice of treatment<sup>19</sup> and negative impacts of co-morbidity<sup>20</sup>. Therefore, the additional interaction effect is hypothesized to exist between age and overall health status and will be considered in the regression model. And a likelihood test will be conducted to test this hypothesis. 
+
+# Reference
+
+1. 	American Cancer Society. Cancer Facts & Figures 2022.
+2. 	Siegel, R. L., Miller, K. D., Fuchs, H. E. & Jemal, A. Cancer statistics, 2022. CA: A Cancer Journal for Clinicians 72, 7–33 (2022).
+3. 	Miller, K. D. et al. Cancer treatment and survivorship statistics, 2022. CA Cancer J Clin 72, 409–436 (2022).
+4. 	Miller, K. D. et al. Cancer treatment and survivorship statistics, 2016. CA Cancer J Clin 66, 271–289 (2016).
+5. 	Ng, H. S., Roder, D., Koczwara, B. & Vitry, A. Comorbidity, physical and mental health among cancer patients and survivors: An Australian population-based study. Asia Pac J Clin Oncol 14, e181–e192 (2018).
+6. 	Kawashima, Y. et al. Interventions to prevent suicidal behavior and ideation for patients with cancer: A systematic review. Gen Hosp Psychiatry 60, 98–110 (2019).
+7. 	Lee, S. A. et al. Impact of Onset of Psychiatric Disorders and Psychiatric Treatment on Mortality Among Patients with Cancer. Oncologist 25, e733–e742 (2020).
+8. 	Singer, S. et al. Co-morbid mental health conditions in cancer patients at working age--prevalence, risk profiles, and care uptake. Psychooncology 22, 2291–2297 (2013).
+9. 	Derogatis, L. R. et al. The prevalence of psychiatric disorders among cancer patients. JAMA 249, 751–757 (1983).
+10.   Wang, Y. et al. Epidemiology of mental health problems among patients with cancer during COVID-19 pandemic. Transl Psychiatry 10, 263 (2020).
+11.   Ji, X., Cummings, J. R., Gilleland Marchak, J., Han, X. & Mertens, A. C. Mental health among nonelderly adult cancer survivors: A national estimate. Cancer 126, 3768–3776 (2020).
+12.   Vartolomei, L., Ferro, M., Mirone, V., Shariat, S. F. & Vartolomei, M. D. Systematic Review: Depression and Anxiety Prevalence in Bladder Cancer Patients. Bladder Cancer 4, 319–326 (2018).
+13.   Zebrack, B. J. et al. Psychological outcomes in long-term survivors of childhood leukemia, Hodgkin’s disease, and non-Hodgkin’s lymphoma: a report from the Childhood Cancer Survivor  Study. Pediatrics 110, 42–52 (2002).
+14.   Benson, J. & Sarangi, A. Psychiatric Considerations in Pediatric Patients With Brain Tumors. Prim Care Companion CNS Disord 24, 21r03228 (2022).
+15.   Substance Abuse & Mental Illness Data Archive. National Survey on Drug Use and Health (NSDUH). Accessed March 1, 2023. https://www.datafiles.samhsa.gov/study-series/national-survey-drug-use-and-health-nsduh-nid13517.
+16.   National Survey on Drug Use and Health Data. Accessed March 1, 2023. https://www.samhsa.gov/data/data-we-collect/nsduh-national-survey-drug-use-and-health.
+17.   Abuse, S. Mental Health Services Administration. Key substance use and mental health indicators in the United States: Results from the 2016 National Survey on Drug Use and Health (HHS Publication No. SMA 17-5044, NSDUH Series H-52). Rockville, MD: Center for Behavioral Health Statistics and Quality. Substance Abuse and Mental Health Services Administration (2017).
+18.   Hoffman, K. E., McCarthy, E. P., Recklitis, C. J. & Ng, A. K. Psychological distress in long-term survivors of adult-onset cancer: results from a national survey. Arch Intern Med 169, 1274–1281 (2009).
+19.   Newcomb, P. A. & Carbone, P. P. Cancer Treatment and Age: Patient Perspectives. JNCI: Journal of the National Cancer Institute 85, 1580–1584 (1993).
+20.   Janssen-Heijnen, M. L. G. et al. Prognostic impact of increasing age and co-morbidity in cancer patients: A population-based approach. Critical Reviews in Oncology/Hematology 55, 231–240 (2005).
+
+
+
+
+

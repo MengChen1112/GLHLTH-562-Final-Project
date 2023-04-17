@@ -1,0 +1,377 @@
+---
+title: "Mental Health Illnesses among Adults with And without A History of Cancer in the United States"
+subtitle: "GLHLTH 562, Spring 2023"
+author: "Meng Chen, Shurui Wang"
+institute: "Duke Global Health Institute"
+date: "2023/04/10"
+output:
+  xaringan::moon_reader:
+    css: [xaringan-themer.css,custom_deck.css]
+    nature:
+      slideNumberFormat: "%current%"
+      highlightStyle: github
+      highlightLines: true
+      ratio: 16:9
+      countIncrementalSlides: true
+    seal: false
+
+---
+
+class: titleSlide 
+class: center, middle
+```{r setup, include=FALSE}
+library(tidyverse)
+library(palmerpenguins)
+options(htmltools.dir.version = FALSE)
+knitr::opts_chunk$set(fig.width=9, fig.height=3.5, fig.retina=3, out.width = "100%", cache = FALSE, echo = TRUE, messAge = FALSE, warning = FALSE, hiline = TRUE)
+
+library(tidyverse)
+library(biostat3)
+library(broom)
+library(ggplot2)
+library(xaringan)
+library(xaringanthemer)
+library(xaringanExtra)
+library(patchwork)
+```
+
+```{r r xaringan-themer, include=FALSE, warning=FALSE}
+style_duo_accent(
+  primary_color = "#1889c9",
+  secondary_color = "#fec52e",
+  header_font_google = google_font("Source Sans Pro"),
+  text_font_google   = google_font("Libre Franklin", "300", "300i"),
+  code_font_google   = google_font("Anonymous Pro"),
+  base_font_size = "30px",
+  text_font_size = "1rem",
+  header_h1_font_size = "2.5rem",
+  header_h2_font_size = "2rem",
+  header_h3_font_size = "1.25rem",
+  padding = "8px 32px 8px 32px",
+)
+```
+
+## `r rmarkdown::metadata$title`
+
+#### `r rmarkdown::metadata$subtitle`
+
+#### `r rmarkdown::metadata$author`
+
+#### `r rmarkdown::metadata$date`
+
+
+---
+class: left
+
+## Introduction
+
+```{r xaringan-panelset1, echo=FALSE}
+xaringanExtra::use_panelset()
+```
+
+.panelset[
+
+.panel[.panel-name[Background]
+
+ - **Over 18 million** cancer survivors and **over 1.9 million** new cancer cases in 2023. 
+ - Higher risks of mental health illness for individuals with a history of cancer.
+ - Studies mainly focused on survivors of **specific types** of cancer or were conducted in **other countries**.
+
+]
+
+.panel[.panel-name[Aim]
+
+ 1. To examine the association between any mental health illness (AMI) and a history cancer in the US.
+ 2. To examine the risk factors of AMI among individuals with a history of cancer. 
+
+]
+
+]
+
+
+---
+class: left
+
+## Methods
+
+ - **Database**: 
+  - National Survey on Drug Use and Health (NSDUH)-- open-access; annual; nationwide; mental health 
+ - **Variable**: 
+  - Outcome: Any mental illness (AMI)
+  - Exposure: Cancer, Drug, Mental health service (MH_service), Age, Sex, Education, Race
+ - **Analysis**: 
+  - Baseline characteristics of the whole - barplot
+  - Difference between non_cancer and cancer - barplot
+  - Association between AMI and cancer status - regression
+
+---
+
+class: left
+
+## Results
+
+```{r wraggling1,echo=FALSE, warning=FALSE, message=FALSE}
+NSDUH <- read.csv(here::here("data", "NSDUH_final_data.csv"))
+
+
+variables <- c("Cancer", "Drug", "MH_service", "Age", "Sex", "Education", "Race")
+
+# Create a function to map subtype values to labels
+map_subtype_labels <- function(variable_name, subtype_value) {
+  labels <- list(
+    Cancer = c("0" = "Non_cancer", "1" = "Cancer"),
+    Drug = c("0" = "No illicit drug use", "1" = "Illicit drug use"), 
+    MH_service= c("1" = "Inpatient", "2" = "Outpatient", "3"="Medication", "4"="No mental health services"),
+    Age = c("1" = "18-34 yrs", "2" = "25-49 yrs", "3"="50-64 yrs", "4"="≥65 yrs"),
+    Education= c("1" = "Less than high school", "2"= "High school graduate", "3"="Some college", "4"="College graduate or higher"),
+    Sex = c("1" = "Male", "2" = "Female"),
+    Race = c("1" = "Non-Hispanic white", "2"="Non-Hispanic black", "3"="Non-Hispanic other", "4"="Hispanic")
+  )
+  return(labels[[variable_name]][[subtype_value]])
+}
+
+
+# Create a function to calculate the percentages for each variable
+calculate_percentages <- function(variable_name) {
+  data_cohort <- NSDUH %>%
+    count(!!sym(variable_name)) %>%
+    mutate(Percentage = n / sum(n) * 100) %>%
+    rename(Subtype = !!sym(variable_name)) %>%
+    mutate(Category = variable_name)
+  return(data_cohort)
+}
+
+plot_NSDUH <- bind_rows(lapply(variables, calculate_percentages))
+
+# Add the Label column
+plot_NSDUH$Label <- mapply(map_subtype_labels, plot_NSDUH$Category, as.character(plot_NSDUH$Subtype))
+
+# Create a stacked bar plot
+ggplot(plot_NSDUH, aes(x = Category, y = Percentage, fill = Label)) +
+  geom_bar(stat = "identity") +
+  labs(title = "Baseline Characteristics of the Whole Cohort", x = NULL, y = "Percentage") +
+  scale_fill_viridis_d(guide = guide_legend(title = "Subtype"), option = "viridis") +
+  theme_minimal() +
+  coord_flip()
+
+
+```
+
+---
+
+class: left
+
+## Results
+
+```{r AMI_barplot, echo=FALSE}
+
+# calculate percentages for each group
+percentages <- aggregate(AMI ~ Cancer, data = NSDUH, FUN = function(x) round(mean(x) * 100, 1))
+
+# plot the bar plot
+ggplot(percentages, aes(x = factor(Cancer), y = AMI)) +
+  geom_bar(stat = "identity", fill = "#7AA9DD", alpha = 0.7) +
+  ylim(0, 30) +
+  geom_text(aes(label = paste0(AMI, "%")), vjust = -0.5) +
+  labs(x = " ", y = " ") +
+  ggtitle("Percentage of Having Any Mental Illness among Individuals with and without Cancer") +
+  theme_minimal()+
+  scale_x_discrete(labels = c("Non_cancer", "Cancer"))
+```
+---
+class: left
+
+## Results
+```{r OR-plot, echo=FALSE}
+NSDUH_count_all <- NSDUH %>%
+  gather(variable, value, -Cancer, -AMI) %>%
+  count(variable, value, Cancer, AMI) %>%
+  group_by(variable, value, Cancer) %>%
+  mutate(Percentage = n / sum(n) * 100) %>%
+  ungroup()
+
+# Define a function to create a bar plot for each exposure variable
+create_bar_plot <- function(variable_name, index) {
+  custom_colors <- c("#7AA9DD", "#2C3E50")
+  plot <- ggplot(NSDUH_count_all %>% filter(variable == variable_name),
+                 aes(x = value, y = Percentage, fill = as.factor(AMI))) +
+    geom_bar(stat = "identity", position = "dodge") +
+    facet_wrap(~ Cancer, labeller = as_labeller(c("0" = "Non_cancer", "1" = "Cancer"))) +
+    scale_fill_manual(values = custom_colors)+
+    labs(title = paste(index),
+         x = variable_name,
+         y = NULL,
+         fill = "AMI") +
+    theme_minimal() +
+    theme(legend.position = "right")
+  return(plot)
+}
+
+# Create a list of plots
+exposure_variables <- c("Drug", "MH_service", "Age", "Sex", "Education", "Race")
+bar_plots <- lapply(seq_along(exposure_variables), function(i) create_bar_plot(exposure_variables[i], i))
+
+
+# Combine the plots with patchwork
+combined_plot <- (bar_plots[[1]] + bar_plots[[2]] + bar_plots[[3]] + bar_plots[[4]] + bar_plots[[5]] + bar_plots[[6]]) +
+  plot_annotation(title = "Percentage of People with AMI between People with and without Cancer Based on Different Exposure Status",
+                  theme = theme(plot.title = element_text(hjust = 0.5)))
+
+# Display the combined plot
+print(combined_plot)
+
+
+```
+
+
+---
+class: left
+
+## Results
+
+```{r wrangling_whole, include=FALSE}
+NSDUH_whole <- NSDUH %>%
+  mutate(Drug = factor(Drug))%>%
+  mutate(MH_service = factor(MH_service))%>%
+  mutate(Age = factor(Age))%>%
+  mutate(Sex = factor(Sex))%>%
+  mutate(Education = factor(Education))%>%
+  mutate(Race = factor(Race))%>%
+  mutate(AMI = factor(AMI))%>%
+  mutate(Cancer = factor(Cancer))
+
+
+# Run the model
+whole_logit <- glm(AMI ~ Cancer + Drug + MH_service + Age + Sex + Education + Race , data = NSDUH_whole, family = binomial(link = "logit"))
+
+whole_logit_OR<- whole_logit %>%
+  tidy(conf.int = TRUE, conf.level = 0.95, exponentiate = TRUE)
+
+whole_logit_OR
+```
+
+
+<div style="height: 500px; overflow: scroll;">
+```{r fp_whole, echo=FALSE,include=FALSE}
+library(ggplot2)
+library(forestplot)
+library(tidyverse)
+library(readxl)
+
+OR_reference <- read_excel(here::here("data", "fp.xlsx"))
+
+
+row_name1 <- cbind(c("Predictors", OR_reference$Predictors), c("Odds Ratios (95% CI)", OR_reference$`OR (95%CI)`), c("P value", OR_reference$`P value`))
+
+OR <- rbind(rep(NA,3),OR_reference)
+```
+
+```{r fp2_whole,fig.height=6,echo=FALSE}
+
+forestplot(labeltext=row_name1,
+           OR$OR,OR$`CL-D`,OR$`CL-U`,
+           zero=1,
+           xlog=F,
+           is.summary = c(T,T,F,F,T,F,F,T,F,F,F,F,T,F,F,T,F,F,F,F,T,F,F,F,F,T,F,F,F,F),
+           graph.pos=4, # 森林图出现在表格第几列
+           boxsize = 0.3,  # 方块大小
+           fnci_norm = fpDrawCircleCI, # 中间图形形状
+           line.margin = unit(5, "mm"), # 线边距
+           lineheight = unit(18, "mm"), # 设置行距
+           colgap = unit(7,"mm"), # 列间距
+           col = fpColors(box = "grey0", lines = "grey0", summary = "grey0"),
+           xticks = c(0,1,2), # x轴坐标
+           clip = c(0.2, 2.3),  # 置信区间范围， 超过会变成箭头
+           lwd.zero =2, # 参考线粗细
+           lwd.xaxis =1,
+           lty.ci = 7, # 误差条的线性
+           lwd.ci = 1, #误差条的线宽度
+           ci.vertices.height = 0.15,
+           gp = gpar(fontsize = 8))%>% # 误差条末端长度
+  fp_add_lines() %>%
+  fp_set_style(box = "royalblue",
+               line = "darkblue",
+               summary = "royalblue",
+               align = "lrrr",
+               hrz_lines = "#999999") %>%
+  fp_set_zebra_style("#EFEFEF")
+
+```
+</div>
+
+---
+class: left
+
+## Results
+
+```{r wrangling_cancer, include=FALSE}
+# Subset the data to include only cases with Cancer
+Cancer <- subset(NSDUH, Cancer == 1) %>%
+  mutate(Drug = factor(Drug))%>%
+  mutate(MH_service = factor(MH_service))%>%
+  mutate(Age = factor(Age))%>%
+  mutate(Sex = factor(Sex))%>%
+  mutate(Education = factor(Education))%>%
+  mutate(Race = factor(Race))%>%
+  mutate(AMI = factor(AMI))
+
+
+# Run the model
+Cancer_logit <- glm(AMI ~ Drug + MH_service + Age + Sex + Education + Race , data = Cancer, family = binomial(link = "logit"))
+
+Cancer_logit_OR<- Cancer_logit %>%
+  tidy(conf.int = TRUE, conf.level = 0.95, exponentiate = TRUE)
+
+Cancer_logit_OR
+
+```
+
+<div style="height: 500px; overflow: scroll;">
+```{r fp_cancer, echo=FALSE,include=FALSE}
+
+OR_cancer <- read_excel(here::here("data", "fp_cancer.xlsx"))
+
+
+row_name2 <- cbind(c("Predictors", OR_cancer$Predictors), c("Odds Ratios (95% CI)", OR_cancer$`OR (95%CI)`), c("P value", OR_cancer$`P value`))
+
+OR_cancer <- rbind(rep(NA,3),OR_cancer)
+```
+
+```{r fp2_cancer,fig.height=6,echo=FALSE}
+
+forestplot(labeltext=row_name2,
+           OR_cancer$OR,OR_cancer$`CL-D`,OR_cancer$`CL-U`,
+           zero=1,
+           xlog=F,
+           is.summary = c(T,T,F,F,T,F,F,F,F,T,F,F,T,F,F,F,F,T,F,F,F,F,T,F,F,F,F),
+           graph.pos=4, # 森林图出现在表格第几列
+           boxsize = 0.3,  # 方块大小
+           fnci_norm = fpDrawCircleCI, # 中间图形形状
+           line.margin = unit(5, "mm"), # 线边距
+           lineheight = unit(18, "mm"), # 设置行距
+           colgap = unit(7,"mm"), # 列间距
+           col = fpColors(box = "grey0", lines = "grey0", summary = "grey0"),
+           xticks = c(0,1,2), # x轴坐标
+           clip = c(0.2, 2.3),  # 置信区间范围， 超过会变成箭头
+           lwd.zero =2, # 参考线粗细
+           lwd.xaxis =1,
+           lty.ci = 7, # 误差条的线性
+           lwd.ci = 1, #误差条的线宽度
+           ci.vertices.height = 0.15,
+           gp = gpar(fontsize = 8))%>% # 误差条末端长度
+  fp_add_lines() %>%
+  fp_set_style(box = "royalblue",
+               line = "darkblue",
+               summary = "royalblue",
+               align = "lrrr",
+               hrz_lines = "#999999") %>%
+  fp_set_zebra_style("#EFEFEF")
+
+```
+
+</div>
+
+
+
+
+
